@@ -1,0 +1,62 @@
+---
+title: "UML - Problem Set 1 "
+author: "Jesús Pacheco"
+date: "10/11/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(skimr)
+```
+
+#Exploration & Computation
+### 1. Obtain a dataset
+The dataset I chose is the labor force participation by gender in Mexico in last ~20 years. I'm interested in knowing the gender wage gap, so I started by looking at how the female labor force is changing. 
+The data was taken from the UN Gender Statistics portal: https://genderstats.un.org/
+
+```{r results="hide", message=FALSE}
+lfp <- read_csv("/Users/JesusPacheco/Downloads/Labour_force_participation_Mex.csv", skip=2, col_names=T)
+skim(lfp)
+```
+
+###2. Choose a visual technique to illustrate your data
+I chose a line showing the time trend. 
+
+###3. Generate and present the visualization and describe what you see.
+```{r q3}
+lfp %>%  filter(Sex != "Both sexes") %>% ggplot(aes(x=Year, y=Value, colour=Sex)) + geom_line() +
+  geom_smooth(method = lm) + 
+  labs(title="Labor force participation in Mexico 1995-2017, by gender") + theme_bw()
+```
+
+We can see a substantial difference between labor force participation: around 80 percent of the males in ages 15 and above, while only half of that for women. We can see that the gap is slowing closing, since women started increasing their participation after 2004. 
+
+###4. Calculate the common measures of central tendency and variation, and then display your results.
+```{r q4}
+lfp %>%  filter(Sex != "Both sexes") %>% group_by(Sex)  %>%  summarize(Average = mean(Value), Median =median(Value), Variance = var(Value))
+```
+```{r}
+lm(Value ~Year, data =lfp, subset=(Sex=="Female"))
+```
+```{r}
+lm(Value ~Year, data =lfp, subset=(Sex=="Male"))
+```
+
+###5. Describe the numeric output in substantive term
+As we could imagine from looking at the graph, we see that over the last 22 years, men are twice as likely as having a job outside the home as women. The variation over the time period, as expected, is not very big since we would expect these social phenomenas to move at a slow pace. But we do see an increase in the female participation. 
+Furthermore, from a simple linear model we can get an estimate of the trend. From those trends we can calculate $$42.95 + .3023x = 77.57 - .2692x$$ that it would take 53 years for woman to have equal participation in the job market. 
+This type of statistics, although not very rigorous, are usually shown to highlight a notion of how fast something is increasing/decreasing. The data seem very relevant for policy implications. Actually in the Mexican current policy context, public daycare programs have suffer important cuts since last year. 
+
+
+#Critical Thinking
+###1. Describe the different information contained in/revealed by visual versus numeric exploratory data analysis. (Hint: Think of different examples of each and then what we might be looking for when leveraging a given technique).
+
+When we are using the visualization, we are usually looking at how the data is distributed, to discover any trend, abnormality of just to do a pre-test. 
+
+###2. Find (and include) two examples of “bad” visualizations and tell me precisely why they’re bad.
+###3. Find (and include) two examples of “good” visualizations and tell me precisely why they’re good.
+###4. When might we use EDA and why/how does it help the research process?
+EDA is important to 
+###5. What did John Tukey mean by “confirmatory” versus “exploratory”? Give me an example for each. 
